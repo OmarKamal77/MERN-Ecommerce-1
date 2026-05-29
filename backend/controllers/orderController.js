@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import productModel from "../models/productModel.js"; // الـ Import ده مهم عشان حساب عدد المنتجات
 import Stripe from "stripe";
 
 // global variables
@@ -33,7 +34,6 @@ const placeOrder = async(req,res) =>{
     } catch (error) {
         console.log(error);
         res.json({success:false,message:error.message})
-        
     }
 }
 
@@ -89,34 +89,25 @@ const placeOrderStripe =async (req,res) =>{
         console.log(error);
         res.json({ success: false, message: error.message });
     }
-
 }
 
-// verefying stripe 
-const verifyStripe =async (req,res) =>{
+// verifying stripe 
+const verifyStripe =async (req,res) => {
     const {orderId,success,userId} = req.body
     try{
         if(success === 'true'){
             await orderModel.findByIdAndUpdate(orderId,{payment:true})
             await userModel.findByIdAndUpdate(userId,{cartData:{}})
             res.json({success:true})
-
-
-        
-        
         }
         else {
-            await orderModel.fingdByIdAndDelete(orderId)
+            await orderModel.findByIdAndDelete(orderId)
             res.json({success:false})
         }
-        
     }catch (error) { 
         console.log(error);
         res.json({ success: false, message: error.message });
-
-
-        }
-    
+    }
 }
 
 // Placing orders using Razorpay Method 
@@ -135,17 +126,15 @@ const allOrders =async (req,res) =>{
     }
 }
 
-// User Order DAta For Frontend
+// User Order Data For Frontend
 const userOrders =async (req,res) =>{
     try {
         const {userId} = req.body
-
         const orders = await orderModel.find({userId})
         res.json({success:true,orders})
     } catch (error) {
         console.log(error);
         res.json({success:false,message:error.message})
-        
     }
 }
 
@@ -161,4 +150,34 @@ const updateStatus =async (req,res) =>{
     }
 }
 
-export {verifyStripe,placeOrder,placeOrderStripe,placeOrderRazorpay,allOrders ,userOrders,updateStatus}
+// الدالة المخصصة والفائقة السرعة للـ Dashboard Analytics بـ Field Projection ذكي
+const getDashboardAnalytics = async (req, res) => {
+    try {
+        // سحب البيانات اللّي محتاجينها للشارت والكروت فقط وإسقاط الحقول الضخمة لتسريع الشبكة
+        const orders = await orderModel.find({})
+            .select("amount date status items.category items.price items.quantity");
+
+        // حساب إجمالي المنتجات بكفاءة تامة مباشرة من الداتا بيز دون جلب مصفوفة المنتجات كاملة
+        const productsCount = await productModel.countDocuments({});
+
+        res.json({
+            success: true,
+            orders,
+            productsCount
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { 
+    verifyStripe, 
+    placeOrder, 
+    placeOrderStripe, 
+    placeOrderRazorpay, 
+    allOrders, 
+    userOrders, 
+    updateStatus, 
+    getDashboardAnalytics 
+};
