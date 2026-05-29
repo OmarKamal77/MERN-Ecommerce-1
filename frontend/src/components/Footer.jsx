@@ -8,9 +8,7 @@ const Footer = () => {
 				<div>
 					<img src={assets.logo} className="mb-5 w-32" alt="" />
 					<p className="w-full md:w-2/3 text-gray-600">
-						Lorem ipsum dolor sit amet consectetur adipisicing elit.
-						Ut eveniet ex laborum recusandae nisi repellendus.
-						Deserunt beatae rem cumque similique.
+						We are a premier fashion destination dedicated to bringing you the latest trends and high-quality apparel. Our mission is to provide stylish, comfortable, and affordable clothing for every occasion, ensuring an exceptional shopping experience
 					</p>
 				</div>
 				<div>
@@ -26,7 +24,7 @@ const Footer = () => {
 					<p className="text-xl font-medium mb-5 ">GET IN TOUCH</p>
 					<ul className="flex flex-col gap-1 text-gray-600">
 						<li>+20-101-066-7079</li>
-						<li>contact@forever.com</li>
+						<li>omar.kamal.fg5@gmail.com</li>
 					</ul>
 				</div>
 			</div>
