@@ -18,9 +18,9 @@ connectCloudinary();
 
 // 🌟 نظام الـ CORS الذكي والمؤمن
 const allowedOrigins = [
-    process.env.FRONTEND_URL, 
-    process.env.ADMIN_URL, 
-    "http://localhost:5173", 
+    "https://mern-ecommerce-1-frontend.vercel.app",
+    "https://mern-ecommerce-1-admin.vercel.app",
+    "http://localhost:5173",
     "http://localhost:5174"  
 ];
 
