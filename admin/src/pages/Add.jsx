@@ -221,7 +221,7 @@ const Add = ({ token }) => {
                     className="w-4 h-4 accent-black rounded cursor-pointer border-gray-300"
                 />
                 <label className="text-sm font-semibold text-gray-700 cursor-pointer select-none" htmlFor="bestseller">
-                    Mark this product as a 🔥 Featured / Bestseller
+                    Mark as Store Bestseller
                 </label>
             </div>
 

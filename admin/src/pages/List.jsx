@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { backendUrl, currency } from "../App";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 let cachedProductsList = null;
 
@@ -69,19 +70,15 @@ const List = ({ token }) => {
     fetchList();
   }, []);
 
-  // 🌟 ماسورة الفلترة المقتبسة بالملّي والقوانين من كود الـ Collection بتاعك لضمان تطابق البيانات
   const filteredProducts = list.filter((product) => {
     if (!product) return false;
 
-    // 1. فحص السيرش بار
     const productName = product.name ? product.name.toLowerCase() : "";
     const matchesSearch = productName.includes(searchTerm.toLowerCase());
 
-    // تجهيز الكلمات للفحص العشوائي والكابيتال والسمول
     const catItem = product.category ? product.category.toLowerCase() : "";
     const subItem = product.subCategory ? product.subCategory.toLowerCase() : "";
 
-    // 2. فحص الـ CATEGORY (مطابق تماماً لمنطق Collection.jsx)
     let matchesCategory = false;
     if (selectedCategory === "All") {
       matchesCategory = true;
@@ -93,7 +90,6 @@ const List = ({ token }) => {
       matchesCategory = catItem.includes("kids") || catItem.includes("boy") || catItem.includes("girls") || catItem.includes("kid");
     }
 
-    // 3. فحص الـ SUB-CATEGORY / PRODUCT TYPE (مطابق تماماً لمنطق وفلاتر Collection.jsx الشاملة)
     let matchesSubCategory = false;
     if (selectedSubCategory === "All") {
       matchesSubCategory = true;
@@ -109,7 +105,6 @@ const List = ({ token }) => {
       matchesSubCategory = catItem.includes("bags") || catItem.includes("shoes") || catItem.includes("bracelets") || catItem.includes("rings") || catItem.includes("earrings") || catItem.includes("necklaces") || catItem.includes("belts") || catItem.includes("scarves") || catItem.includes("hats") || catItem.includes("socks") || subItem.includes("accessories") || catItem.includes("accessories") || catItem.includes("unisex");
     }
 
-    // 4. فحص حالة التميز (Highlight Status)
     let matchesBestseller = true;
     const isBestseller = product.bestseller === true || product.bestseller === "true";
     if (bestsellerFilter === "Featured") matchesBestseller = isBestseller;
@@ -118,20 +113,17 @@ const List = ({ token }) => {
     return matchesSearch && matchesCategory && matchesSubCategory && matchesBestseller;
   });
 
-  // 🌟 نظام الترتيب حسب السعر (مطابق لـ Collection.jsx)
   if (sortType === "low-high") {
     filteredProducts.sort((a, b) => a.price - b.price);
   } else if (sortType === "high-low") {
     filteredProducts.sort((a, b) => b.price - a.price);
   }
 
-  // لوجيك الـ Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
-  // إعادة التوجيه للصفحة الأولى عند تغيير أي فلتر
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategory, selectedSubCategory, bestsellerFilter, sortType]);
@@ -158,10 +150,7 @@ const List = ({ token }) => {
         </span>
       </div>
 
-      {/* بار التحكم والفلاتر الخماسي الاحترافي المربوط بالمتجر بالملّي */}
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-        
-        {/* 1. السيرش بالاسم */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Search Product</label>
           <input 
@@ -173,7 +162,6 @@ const List = ({ token }) => {
           />
         </div>
 
-        {/* 2. الفئة الرئيسية */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</label>
           <select
@@ -188,7 +176,6 @@ const List = ({ token }) => {
           </select>
         </div>
 
-        {/* 3. التصنيف الفرعي المحدث بالملي مع الـ Collection */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Product Type</label>
           <select
@@ -205,7 +192,6 @@ const List = ({ token }) => {
           </select>
         </div>
 
-        {/* 4. حالة التميز */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Highlight Status</label>
           <select
@@ -214,12 +200,11 @@ const List = ({ token }) => {
             className="border border-gray-200 text-sm rounded-lg p-2 bg-gray-50 text-gray-700 font-medium outline-none cursor-pointer focus:border-black transition-all"
           >
             <option value="All">All Products</option>
-            <option value="Featured">⭐ Featured & Bestsellers</option>
-            <option value="Standard">📦 Standard Stock</option>
+            <option value="Featured">Featured & Bestsellers</option>
+            <option value="Standard">Standard Stock</option>
           </select>
         </div>
 
-        {/* 5. الترتيب حسب السعر */}
         <div className="flex flex-col gap-1">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort By Price</label>
           <select
@@ -234,7 +219,6 @@ const List = ({ token }) => {
         </div>
       </div>
 
-      {/* الجدول وعرض المنتجات وصور المتجر الثابتة */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="hidden md:grid grid-cols-[1.5fr_3fr_1.5fr_1fr_1fr] items-center py-4 px-4 bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
           <span>Product Image</span>
@@ -249,14 +233,7 @@ const List = ({ token }) => {
             <p className="text-center text-gray-400 py-12 font-medium">No products match your filters.</p>
           ) : (
             currentItems.map((item, index) => {
-              const rawImage = item.image && item.image[0] ? item.image[0] : "";
-              
-              let finalImgSrc = "";
-              if (rawImage.startsWith("http")) {
-                finalImgSrc = rawImage;
-              } else {
-                finalImgSrc = `http://localhost:5173/src/assets/${rawImage}.png`;
-              }
+              const finalImgSrc = item.image && item.image[0] ? item.image[0] : "";
 
               return (
                 <div
@@ -270,7 +247,7 @@ const List = ({ token }) => {
                       alt="" 
                     />
                     {item.bestseller && (
-                      <span className="absolute -top-1 -left-1 text-xs bg-white p-0.5 rounded-full shadow-sm border border-gray-50 z-10">⭐</span>
+                      <span className="absolute top-1 left-1 w-2 h-2 bg-blue-500 rounded-full shadow-sm z-10"></span>
                     )}
                   </div>
 
@@ -289,12 +266,26 @@ const List = ({ token }) => {
                     {currency}{item.price}
                   </p>
                   
-                  <div className="text-right md:text-center">
+                  {/* أزرار التحكم بعد استبدال الإيموجيز بأيقونات SVG تفاعلية فاخرة */}
+                  <div className="text-right md:text-center flex items-center justify-center gap-3">
+                    <Link
+                      to={`/edit/${item._id}`}
+                      className="text-gray-400 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 rounded-lg p-2 inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 active:scale-95 shadow-sm border border-gray-100 focus:outline-none"
+                      title="Edit Product"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                      </svg>
+                    </Link>
+
                     <button
                       onClick={() => removeProduct(item._id)}
-                      className="text-gray-400 hover:text-red-600 font-bold transition-colors text-sm p-2 bg-gray-50 hover:bg-red-50 rounded-lg inline-flex items-center justify-center w-8 h-8"
+                      className="text-gray-400 hover:text-red-600 bg-gray-50 hover:bg-red-50 rounded-lg p-2 inline-flex items-center justify-center w-8 h-8 transition-all duration-200 hover:scale-110 active:scale-95 shadow-sm border border-gray-100 focus:outline-none"
+                      title="Delete Product"
                     >
-                      ✕
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -304,7 +295,6 @@ const List = ({ token }) => {
         </div>
       </div>
 
-      {/* أزرار التنقل السفلية */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between border-t border-gray-100 pt-4 px-2">
           <p className="text-xs font-medium text-gray-400">

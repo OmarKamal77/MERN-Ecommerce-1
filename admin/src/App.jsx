@@ -5,13 +5,13 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Add from "./pages/Add";
 import List from "./pages/List";
 import Orders from "./pages/Orders";
+import Edit from "./pages/Edit"; // 🌟 استيراد صفحة التعديل الجديدة هنا
 import Login from "./components/Login";
-import ProtectedRoute from "./components/ProtectedRoute"; // حارس البوابة الذكي
+import ProtectedRoute from "./components/ProtectedRoute"; 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './pages/Dashboard';
 
-// 🌟 تعديل مأمن: يقرأ المتغير الحي من Vercel، ويفك على السيرفر المحلي لو شغال لوكال
 export const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 export const currency = '$'
 
@@ -23,7 +23,7 @@ const App = () => {
         localStorage.setItem('token', token)
     }, [token])
 
-    // تأثير ذكي لتغيير عنوان تابة المتصفح في الأدمن أوتوماتيكياً
+    // تأثير ذكي لتغيير عنوان تابة المتصفح في الأدمن أوتوماتيكياً ودعم تابة الـ Edit التفاعلية
     useEffect(() => {
         if (token === "") {
             document.title = "Admin Login | Shopping fashion";
@@ -38,7 +38,13 @@ const App = () => {
         };
 
         const currentPath = location.pathname;
-        document.title = adminTitles[currentPath] || "Admin Panel | Shopping fashion";
+        
+        // فحص ذكي لو المسار يبدأ بـ edit لتغيير العنوان ديناميكياً
+        if (currentPath.startsWith("/edit/")) {
+            document.title = "Edit Product | Admin Panel | Shopping fashion";
+        } else {
+            document.title = adminTitles[currentPath] || "Admin Panel | Shopping fashion";
+        }
     }, [location, token]);
 
     return (
@@ -61,6 +67,8 @@ const App = () => {
                                     <Route path="/add" element={<Add token={token} />} />
                                     <Route path="/list" element={<List token={token} />} />
                                     <Route path="/orders" element={<Orders token={token} />} />
+                                    {/* ✏️ الـ Route المأمن الجديد لصفحة التعديل ويمرر الـ token والـ ID الملقوط من الرابط */}
+                                    <Route path="/edit/:id" element={<Edit token={token} />} />
                                 </Route>
 
                                 {/* 🔄 التوجيه التلقائي الفوري للرئيسية عند كتابة مسار عشوائي */}

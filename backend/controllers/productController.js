@@ -143,4 +143,74 @@ const getSearchSuggestions = async (req, res) => {
     }
 };
 
-export { listProducts, addProduct, removeProduct, singleProduct, addProductReview, getSearchSuggestions };
+// 🌟 دالة تعديل وتحديث المنتج الذكية المضافة حديثاً
+const updateProduct = async (req, res) => {
+    try {
+        const {
+            id,
+            name,
+            description,
+            price,
+            category,
+            subCategory,
+            sizes,
+            bestseller,
+        } = req.body;
+
+        // 1. تجهيز كائن البيانات المحدثة الأساسية (النصية والعددية)
+        const updateData = {
+            name,
+            description,
+            category,
+            price: Number(price),
+            subCategory,
+            bestseller: bestseller === "true",
+            sizes: JSON.parse(sizes),
+        };
+
+        // 2. فحص ما إذا قام الأدمن برفع ملفات صور جديدة للتحديث
+        const image1 = req.files && req.files.image1 && req.files.image1[0];
+        const image2 = req.files && req.files.image2 && req.files.image2[0];
+        const image3 = req.files && req.files.image3 && req.files.image3[0];
+        const image4 = req.files && req.files.image4 && req.files.image4[0];
+
+        const images = [image1, image2, image3, image4].filter(
+            (item) => item !== undefined
+        );
+
+        // إذا كانت هناك صور جديدة، يتم رفعها لـ Cloudinary وتحديث المصفوفة، وإلا سيحتفظ السيستم بالقديمة تلقائياً
+        if (images.length > 0) {
+            const imagesUrl = await Promise.all(
+                images.map(async (item) => {
+                    let result = await cloudinary.uploader.upload(item.path, {
+                        resource_type: "image",
+                    });
+                    return result.secure_url;
+                })
+            );
+            updateData.image = imagesUrl;
+        }
+
+        // 3. العثور على المنتج وتحديثه في MongoDB Atlas
+        const updatedProduct = await productModel.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (!updatedProduct) {
+            return res.json({ success: false, message: "Product not found" });
+        }
+
+        res.json({ success: true, message: "Product Updated Successfully" });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { 
+    listProducts, 
+    addProduct, 
+    removeProduct, 
+    singleProduct, 
+    addProductReview, 
+    getSearchSuggestions, 
+    updateProduct // 🌟 تصدير الدالة الجديدة لربطها بالـ Routes
+};

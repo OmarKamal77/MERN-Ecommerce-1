@@ -5,7 +5,8 @@ import {
     removeProduct,
     singleProduct,
     addProductReview,
-    getSearchSuggestions // 🌟 ضفنا الدالة هنا عشان الـ Import يكمل
+    getSearchSuggestions,
+    updateProduct // 🌟 استيراد الدالة الجديدة هنا
 } from "../controllers/productController.js";
 import upload from "../middleware/multer.js";
 import adminAuth from "../middleware/adminAuth.js";
@@ -24,6 +25,20 @@ productRouter.post(
     ]),
     addProduct
 );
+
+// 🌟 الـ Route الجديد الخاص بتعديل المنتج بـ صلاحيات الأدمن والـ Multer لاستقبال الصور الاختيارية
+productRouter.post(
+    "/update",
+    adminAuth,
+    upload.fields([
+        { name: "image1", maxCount: 1 },
+        { name: "image2", maxCount: 1 },
+        { name: "image3", maxCount: 1 },
+        { name: "image4", maxCount: 1 },
+    ]),
+    updateProduct
+);
+
 productRouter.post("/remove", adminAuth, removeProduct);
 productRouter.post("/single", singleProduct);
 productRouter.get("/list", listProducts);
